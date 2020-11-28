@@ -1,25 +1,26 @@
-import logo from './logo.svg';
+import React from 'react'
 import './App.css';
+import Main from "./Components/Main";
+import {Route} from "react-router-dom";
+import Login from "./Login";
+import {BrowserRouter} from "react-router-dom";
+import {GetCurrentUser} from "./states";
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    return (
+        <BrowserRouter>
+            <Router/>
+        </BrowserRouter>
+    );
+}
+
+const Router = () => {
+    if(GetCurrentUser().id !== 0){
+        return <Main/>
+    }
+    else {
+        return <Route path="/" component={Login}/>
+    }
 }
 
 export default App;
