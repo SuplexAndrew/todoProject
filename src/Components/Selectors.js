@@ -1,45 +1,85 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import React from "react";
-import Modal from "./Modal"
-import {OnChangeSort} from "../states"
-import {OnChangeShow} from "../states"
+import {getSortFunction} from "./CompareFunction";
+import {getShowFunction} from "./CompareFunction";
+import {OnNewTask, tasks} from "../states"
+import Task from "./Task";
+import TaskEdit from "./TaskEdit";
+import {EditPortal} from "./EditPortal";
+
 
 class Settings extends React.Component {
-    optionDate = [
+    optionShow = [
         {id: 1, name: "Сегодня"},
-        {id: 2, name: "Неделя"},
-        {id: 3, name: "Месяц"},
-        {id: 4, name: "Все"}
+        {id: 2, name: "Завтра"},
+        {id: 3, name: "Неделя"},
+        {id: 4, name: "Месяц"},
+        {id: 5, name: "Все"}
     ];
-
     optionSort = [
         {id: 1, name: "Дате начала"},
         {id: 2, name: "Дате окончания"},
         {id: 3, name: "Последнему обновлению"},
         {id: 4, name: "Алфавиту"}
     ];
-    state = {
-        showModal: false
-    }
-    //<button onClick={() => this.props.onClick()}>Создать новую задачу</button>
-    handleModal = () => {
-        this.setState({showModal: !this.state.showModal});
-    }
-    render() {
-        return (
-            <div className="d-flex flex-column flex-md-row align-items-center px-md-4  mb-3 bg-white border-bottom ">
-                <label>Отображать на:</label>
-                <select onChange={(e) => OnChangeShow(e.target.value)}>
-                    {this.optionDate.map(item => <option key={item.id} value={item.name}>{item.name}</option>)}
-                </select>
-                <label>Сортировать по:</label>
-                <select onChange={(e) => OnChangeSort(e.target.value)}>
-                    {this.optionSort.map(item => <option key={item.id} value={item.name}>{item.name}</option>)}
-                </select>
-                {/* eslint-disable-next-line react/jsx-no-undef */}
-                { this.state.showModal && <Modal handleModal={this.handleModal}/> }
-                <button onClick={this.handleModal}> Show modal </button>
 
+    constructor(props) {
+        super(props);
+        this.state = {
+            tasks: tasks,
+            isEdit: false
+        }
+        this.handleChangeOptionShow = this.handleChangeOptionShow.bind(this);
+        this.handleChangeOptionSort = this.handleChangeOptionSort.bind(this);
+    }
+
+    handleChangeOptionShow = (e) => {
+        let showState = this.optionShow.find(item => item.name === e.target.value).id;
+        this.setState({tasks: tasks.filter(getShowFunction(showState))});
+        alert((Date.now() - tasks[1].dateEnd)/(1000*3600))
+    }
+    handleChangeOptionSort = (e) => {
+        let sortState = this.optionSort.find(item => item.name === e.target.value).id;
+        this.setState({tasks: tasks.sort(getSortFunction(sortState))});
+        alert(sortState)
+    }
+
+    handleOnClick = () => {
+        this.isEdit = !this.isEdit;
+    }
+    handleOnSubmit = (props) => {
+        OnNewTask(props);
+        this.isEdit = !this.isEdit;
+    }
+
+    render() {
+        //alert(this.state.optionSort);
+        return (
+            <div>
+                <div className="d-flex flex-column flex-md-row
+                align-items-center px-md-4  mb-3 bg-white border-bottom ">
+                    <label>Отображать на:</label>
+                    <select value={this.state.optionShow} onChange={this.handleChangeOptionShow}>
+                        {this.optionShow.map(item => <option key={item.id} value={item.name}>{item.name}</option>)}
+                    </select>
+                    <label>Сортировать по:</label>
+                    <select value={this.state.optionSort} onChange={this.handleChangeOptionSort}>
+                        {this.optionSort.map(item => <option key={item.id} value={item.name}>{item.name}</option>)}
+                    </select>
+                    <button onClick={this.handleOnClick}>Создать новую задачу</button>
+                </div>
+                <EditPortal isEdit={this.isEdit} children=<TaskEdit onClick={this.handleOnSubmit}/> />
+                <div>
+                    {this.state.tasks.map(item =>
+                        <Task
+                            key={item.id}
+                            title={item.title}
+                            text={item.text}
+                            employee={item.employee}
+                            dateStart={item.dateStart}
+                            dateEnd={item.dateEnd}
+                        />)}
+                </div>
             </div>
         )
     }

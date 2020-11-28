@@ -1,6 +1,9 @@
 import React from "react";
+import "./TaskEdit.css"
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 class TaskEdit extends React.Component {
+
     constructor(props) {
         super(props);
         this.state = {title: '', employee: '', text: '', dateStart: '', dateEnd: ''};
@@ -9,6 +12,7 @@ class TaskEdit extends React.Component {
         this.handleChangeText = this.handleChangeText.bind(this);
         this.handleChangeDateStart = this.handleChangeDateStart.bind(this);
         this.handleChangeDateEnd = this.handleChangeDateEnd.bind(this);
+
     }
 
     handleChangeTitle(e) {
@@ -31,26 +35,35 @@ class TaskEdit extends React.Component {
         this.setState({dateEnd: e.target.value});
     }
 
+
     render() {
-        if (this.props.isEdit)
-            return (
-                <div className="bg-light">
+        return (
+            <div className="task-edit">
+                <div className="edit-field">
                     <label>Заголовок: </label>
                     <input type="text" onChange={this.handleChangeTitle}/>
+                </div>
+                <div className="edit-field">
                     <label>Ответственный: </label>
                     <input type="text" onChange={this.handleChangeEmployee}/>
+                </div>
+                <div className="edit-field">
                     <label>Описание: </label>
                     <input type="text" onChange={this.handleChangeText}/>
-                    <label>Дата начала: </label>
-                    <input type="calendar" onChange={this.handleChangeDateStart}/>
-                    <label>Дата окончания: </label>
-                    <input type="calendar" onChange={this.handleChangeDateEnd}/>
-                    <button type="submit" onClick={() => this.props.onClick(this.state)}>Сохранить</button>
                 </div>
-            )
-        else
-            return <div/>
+                <div className="edit-field">
+                    <label>Дата начала: </label>
+                    <input type="date" className="pl-md-4" onChange={this.handleChangeDateStart}/>
+                </div>
+                <div className="edit-field">
+                    <label>Дата окончания: </label>
+                    <input type="date" className="pl-md-4" onChange={this.handleChangeDateEnd}/>
+                </div>
+                <button type="submit" onClick={() => this.props.onClick(this.state)}>Сохранить</button>
+            </div>
+        )
     }
 }
+
 
 export default TaskEdit;

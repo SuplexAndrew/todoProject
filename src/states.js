@@ -10,8 +10,8 @@ export let tasks = [
         title: "XTask1",
         text: "123",
         employee: "Sergey",
-        dateStart: new Date(2020, 9, 1, 0, 0, 0, 0).toLocaleString().split(',')[0],
-        dateEnd: new Date(2021, 1, 12, 0, 0, 0, 0).toLocaleString().split(',')[0],
+        dateStart: Date.parse("2020-10-10"),
+        dateEnd: Date.parse("2020-11-30"),
         lastEdit: new Date()
     },
     {
@@ -19,8 +19,8 @@ export let tasks = [
         title: "DTask2",
         text: "555!",
         employee: "Artem",
-        dateStart: new Date(2020, 10, 8, 0, 0, 0, 0).toLocaleString().split(',')[0],
-        dateEnd: new Date(2020, 10, 30, 0, 0, 0, 0).toLocaleString().split(',')[0],
+        dateStart: Date.parse("2020-10-17"),
+        dateEnd: Date.parse("2021-11-5"),
         lastEdit: new Date()
     },
     {
@@ -28,8 +28,8 @@ export let tasks = [
         title: "ATask3",
         text: "000xxxx",
         employee: "Olga",
-        dateStart: new Date(2020, 11, 17, 0, 0, 0, 0).toLocaleString().split(',')[0],
-        dateEnd: new Date(2020, 11, 25, 0, 0, 0, 0).toLocaleString().split(',')[0],
+        dateStart: Date.parse("2020-10-16"),
+        dateEnd: Date.parse("2020-11-30"),
         lastEdit: new Date()
     },
     {
@@ -37,8 +37,8 @@ export let tasks = [
         title: "AcvTask4",
         text: "0---8",
         employee: "Maksim",
-        dateStart: new Date(2020, 10, 20, 0, 0, 0, 0).toLocaleString().split(',')[0],
-        dateEnd: new Date(2020, 11, 31, 0, 0, 0, 0).toLocaleString().split(',')[0],
+        dateStart: Date.parse("2020-10-20"),
+        dateEnd: Date.parse("2020-10-30"),
         lastEdit: new Date()
     },
     {
@@ -46,8 +46,8 @@ export let tasks = [
         title: "JunTask5",
         text: "0////",
         employee: "Maksim",
-        dateStart: new Date(2020, 10, 17, 0, 0, 0, 0).toLocaleString().split(',')[0],
-        dateEnd: new Date(2020, 10, 28, 0, 0, 0, 0).toLocaleString().split(',')[0],
+        dateStart: Date.parse("2020-10-18"),
+        dateEnd: Date.parse("2020-11-4"),
         lastEdit: new Date()
     },
 ]

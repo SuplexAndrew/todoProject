@@ -1,0 +1,13 @@
+.task-edit{
+    width: 100%;
+    max-width: 350px;
+    padding: 15px;
+    margin: auto;
+    position: relative;
+    background: #ffbebe;
+    z-index: 999999;
+}
+.edit-field{
+    margin-right: 15px;
+    text-align: right;
+}
