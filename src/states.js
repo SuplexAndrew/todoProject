@@ -1,9 +1,5 @@
-import {getSortFunction} from "./Components/CompareFunction";
-import {getShowFunction} from "./Components/CompareFunction";
 import Refresh from "./Refresh"
 
-let showState;
-let sortState;
 export let tasks = [
     {
         id: 1,
@@ -52,13 +48,12 @@ export let tasks = [
     },
 ]
 
-let _CurrentUser = {id: 3, login: "", password: ""};
+let _CurrentUser = {id: 3, login: "Default", password: ""};
 export const Users = [
     {id: 1, login: "Admin", password: "123"},
     {id: 2, login: "User1", password: "1234"},
 ]
 export const CheckUser = (props) => {
-    //let  = {login: props.login.toString(), password: props.password.toString()};
     let user = Users.find(user => user.login === props.login && user.password === props.password);
     let b = user !== undefined;
     if (b)
@@ -100,25 +95,22 @@ export const OnNewTask = (props) => {
             id: tasks.length,
             title: props.title,
             text: props.text,
-            employee: props.name,
+            employee: props.employee,
             dateStart: props.dateStart,
             dateEnd: props.dateEnd,
             lastEdit: new Date()
         }
     )
 }
-
-export const OnChangeShow = (newState) => {
-    showState = optionDate.find(item => item.name === newState).id;
-    let v = tasks.filter(getShowFunction(showState));
-    alert(v.length);
-    Refresh(v);
-}
-
-
-export const OnChangeSort = (newState) => {
-    sortState = optionSort.find(item => item.name === newState).id;
-    tasks.sort(getSortFunction(sortState));
-    alert(sortState);
-    Refresh(tasks);
+export const OnEditTask = (props) => {
+    tasks[props.id] =
+        {
+            id: props.id,
+            title: props.title,
+            text: props.text,
+            employee: props.employee,
+            dateStart: props.dateStart,
+            dateEnd: props.dateEnd,
+            lastEdit: new Date()
+        }
 }

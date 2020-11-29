@@ -3,7 +3,7 @@
     max-width: 350px;
     padding: 15px;
     margin: auto;
-    position: relative;
+    position: absolute;
     background: #ffbebe;
     z-index: 999999;
 }

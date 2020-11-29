@@ -5,7 +5,7 @@ import {getShowFunction} from "./CompareFunction";
 import {OnNewTask, tasks} from "../states"
 import Task from "./Task";
 import TaskEdit from "./TaskEdit";
-import {EditPortal} from "./EditPortal";
+import Modal from "./Modal";
 
 
 class Settings extends React.Component {
@@ -36,20 +36,23 @@ class Settings extends React.Component {
     handleChangeOptionShow = (e) => {
         let showState = this.optionShow.find(item => item.name === e.target.value).id;
         this.setState({tasks: tasks.filter(getShowFunction(showState))});
-        alert((Date.now() - tasks[1].dateEnd)/(1000*3600))
     }
     handleChangeOptionSort = (e) => {
         let sortState = this.optionSort.find(item => item.name === e.target.value).id;
         this.setState({tasks: tasks.sort(getSortFunction(sortState))});
-        alert(sortState)
     }
 
     handleOnClick = () => {
-        this.isEdit = !this.isEdit;
+        this.setState({isEdit: this.isEdit = !this.isEdit});
     }
     handleOnSubmit = (props) => {
-        OnNewTask(props);
-        this.isEdit = !this.isEdit;
+        if (!props.isCancel) {
+            OnNewTask(props)
+        }
+        this.setState({isEdit: this.isEdit = !this.isEdit});
+    }
+    handleOnEdit = (props) => {
+
     }
 
     render() {
@@ -68,7 +71,9 @@ class Settings extends React.Component {
                     </select>
                     <button onClick={this.handleOnClick}>Создать новую задачу</button>
                 </div>
-                <EditPortal isEdit={this.isEdit} children=<TaskEdit onClick={this.handleOnSubmit}/> />
+                {this.isEdit && <Modal>
+                    <TaskEdit onClick={this.handleOnSubmit}/>
+                </Modal>}
                 <div>
                     {this.state.tasks.map(item =>
                         <Task

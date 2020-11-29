@@ -1,10 +1,11 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import Refresh from "../Refresh";
+import TaskEdit from "./TaskEdit";
 
+//<TaskEdit onSubmit={this.props.onClick}/>
 export class EditPortal extends React.Component {
-    el = document.createElement("div");
-
+    el = document.getElementById("boo");
+    children = <h1>BOOO</h1>
     componentDidMount() {
         document.body.appendChild(this.el);
     }
@@ -15,7 +16,7 @@ export class EditPortal extends React.Component {
 
     render() {
         if (this.props.isEdit)
-            return ReactDOM.createPortal(this.props.children, this.el)
+            return ReactDOM.createPortal(this.children, this.el)
         else
             return null;
     }
