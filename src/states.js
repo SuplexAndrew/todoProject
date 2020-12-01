@@ -92,7 +92,7 @@ export const optionSort = [
 export const OnNewTask = (props) => {
     tasks.push(
         {
-            id: tasks.length,
+            id: tasks.length + 1,
             title: props.title,
             text: props.text,
             employee: props.employee,

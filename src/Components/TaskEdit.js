@@ -7,7 +7,14 @@ class TaskEdit extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = {title: '', employee: Users[0].login, text: '', dateStart: new Date(), dateEnd: ''};
+        this.state = {
+            id: props.id,
+            title: props.title,
+            employee: props.employee,
+            text: props.text,
+            dateStart: props.dateStart,
+            dateEnd: props.dateEnd
+        };
         this.handleChangeTitle = this.handleChangeTitle.bind(this);
         this.handleChangeEmployee = this.handleChangeEmployee.bind(this);
         this.handleChangeText = this.handleChangeText.bind(this);
@@ -47,7 +54,8 @@ class TaskEdit extends React.Component {
             alert("Некорректные данные")
         }
     }
-    handleCancel(){
+
+    handleCancel() {
         this.props.onClick({isCancel: true})
     }
 
@@ -57,7 +65,7 @@ class TaskEdit extends React.Component {
             <div className="task-edit">
                 <div className="edit-field">
                     <label>Заголовок: </label>
-                    <input type="text" onChange={this.handleChangeTitle}/>
+                    <input type="text" value={this.state.title} onChange={this.handleChangeTitle}/>
                 </div>
                 <div className="edit-field">
                     <label>Ответственный: </label>
@@ -71,7 +79,8 @@ class TaskEdit extends React.Component {
                 </div>
                 <div className="edit-field">
                     <label>Дата начала: </label>
-                    <input type="date" value={this.state.dateStart} className="pl-md-4" onChange={this.handleChangeDateStart}/>
+                    <input type="date" value={this.state.dateStart} className="pl-md-4"
+                           onChange={this.handleChangeDateStart}/>
                 </div>
                 <div className="edit-field">
                     <label>Дата окончания: </label>

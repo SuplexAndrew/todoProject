@@ -15,7 +15,7 @@ const Task = (props) => {
                 <p className="my-2 my-md-0 mr-md-3">{props.text}</p>
                 <p className="my-2 my-md-0 mr-md-3">Дата Начала: {d1}</p>
                 <p>Дедлайн: {d2}</p>
-                <button type="submit" onClick={() => props.onEdit()}>Изменить</button>
+                <button type="submit" onClick={() => props.onClick({id: props.id})}>Изменить</button>
             </div>
         </div>
     )

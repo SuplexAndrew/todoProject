@@ -2,7 +2,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import React from "react";
 import {getSortFunction} from "./CompareFunction";
 import {getShowFunction} from "./CompareFunction";
-import {OnNewTask, tasks} from "../states"
+import {OnEditTask, OnNewTask, tasks} from "../states"
 import Task from "./Task";
 import TaskEdit from "./TaskEdit";
 import Modal from "./Modal";
@@ -26,33 +26,52 @@ class Settings extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            showState: 1,
+            sortState: 1,
             tasks: tasks,
-            isEdit: false
+            isCreating: false,
+            isEditing: false,
+            EditingID: 0,
         }
         this.handleChangeOptionShow = this.handleChangeOptionShow.bind(this);
         this.handleChangeOptionSort = this.handleChangeOptionSort.bind(this);
     }
 
     handleChangeOptionShow = (e) => {
-        let showState = this.optionShow.find(item => item.name === e.target.value).id;
-        this.setState({tasks: tasks.filter(getShowFunction(showState))});
+        let ss = this.optionShow.find(item => item.name === e.target.value).id
+        this.setState({showState: ss});
+        let t = tasks.filter(getShowFunction(ss))
+        t.sort(getSortFunction(this.state.sortState))
+        this.setState({tasks: t, showState: ss});
     }
     handleChangeOptionSort = (e) => {
-        let sortState = this.optionSort.find(item => item.name === e.target.value).id;
-        this.setState({tasks: tasks.sort(getSortFunction(sortState))});
+        let ss = this.optionSort.find(item => item.name === e.target.value).id
+        let t = tasks.filter(getShowFunction(this.state.showState))
+        t.sort(getSortFunction(ss))
+        //debugger
+        this.setState({tasks: t, sortState: ss});
     }
 
     handleOnClick = () => {
-        this.setState({isEdit: this.isEdit = !this.isEdit});
+        this.setState({isCreating: this.isCreating = !this.isCreating});
     }
     handleOnSubmit = (props) => {
         if (!props.isCancel) {
             OnNewTask(props)
         }
-        this.setState({isEdit: this.isEdit = !this.isEdit});
+        this.setState({isCreating: this.isCreating = !this.isCreating});
     }
     handleOnEdit = (props) => {
-
+        this.setState({EditingID: props.id, isEditing: this.isEditing = !this.isEditing});
+    }
+    handleOnSubmitEdit = (props) => {
+        if (!props.isCancel) {
+            OnEditTask(props)
+            debugger;
+            this.setState({tasks: tasks})
+            alert(this.state.tasks[1].title)
+        }
+        this.setState({EditingID: 0, isEditing: this.isEditing = !this.isEditing});
     }
 
     render() {
@@ -71,18 +90,32 @@ class Settings extends React.Component {
                     </select>
                     <button onClick={this.handleOnClick}>Создать новую задачу</button>
                 </div>
-                {this.isEdit && <Modal>
+                {this.isCreating && <Modal>
                     <TaskEdit onClick={this.handleOnSubmit}/>
+                </Modal>}
+                {this.isEditing &&
+                <Modal>
+                    <TaskEdit
+                        onClick={this.handleOnSubmitEdit}
+                        id={this.state.EditingID}
+                        title={tasks[1].title}
+                        employee={tasks[1].employee}
+                        text={tasks[1].text}
+                        dateStart={tasks[1].dateStart}
+                        dateEnd={tasks[1].dateEnd}
+                    />
                 </Modal>}
                 <div>
                     {this.state.tasks.map(item =>
                         <Task
                             key={item.id}
+                            id={item.id}
                             title={item.title}
                             text={item.text}
                             employee={item.employee}
                             dateStart={item.dateStart}
                             dateEnd={item.dateEnd}
+                            onClick={this.handleOnEdit}
                         />)}
                 </div>
             </div>
