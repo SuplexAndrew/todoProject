@@ -1,4 +1,4 @@
-import {CheckUser} from "./states"
+import {CheckUser} from "./States/states"
 import React, {useState} from 'react'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './Login.css'

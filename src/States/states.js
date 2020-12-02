@@ -1,4 +1,3 @@
-import Refresh from "./Refresh"
 
 export let tasks = [
     {
@@ -49,6 +48,7 @@ export let tasks = [
 ]
 
 let _CurrentUser = {id: 3, login: "Default", password: ""};
+
 export const Users = [
     {id: 1, login: "Admin", password: "123"},
     {id: 2, login: "User1", password: "1234"},
@@ -69,7 +69,6 @@ export const CheckUser = (props) => {
 }
 const LoginUser = (id) => {
     _CurrentUser = Users.find(user => user.id === id);
-    Refresh();
 }
 export const GetCurrentUser = () => {
     return _CurrentUser;

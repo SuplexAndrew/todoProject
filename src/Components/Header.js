@@ -1,5 +1,5 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
-import {GetCurrentUser} from "../states";
+import {GetCurrentUser} from "../States/states";
 
 const Header = () => {
     return(

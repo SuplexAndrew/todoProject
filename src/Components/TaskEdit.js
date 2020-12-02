@@ -1,7 +1,7 @@
 import React from "react";
 import "./TaskEdit.css"
 import 'bootstrap/dist/css/bootstrap.min.css';
-import {Users} from "../states"
+import {Users} from "../States/states"
 
 class TaskEdit extends React.Component {
 
