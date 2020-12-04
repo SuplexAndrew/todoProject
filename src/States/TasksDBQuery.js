@@ -3,11 +3,11 @@ import React, {useState, useEffect} from 'react';
 function App() {
     const [tasks, setTasks] = useState(false);
     useEffect(() => {
-        getTask();
+        getTasks();
     }, []);
 
-    function getTask() {
-        fetch('http://localhost:3001')
+    function getTasks() {
+        fetch('http://localhost:3000')
             .then(response => {
                 return response.text();
             })
@@ -16,7 +16,7 @@ function App() {
             });
     }
 
-    function createTask(props) {
+    /*function createTask(props) {
         let title = props.title;
         let text = props.text;
         let dateStart = props.dateStart
@@ -26,7 +26,7 @@ function App() {
         let status = props.status
         let CreatorId = props.creatorId
         let EmployeeId = props.employeeId
-        fetch('http://localhost:3001/Create', {
+        fetch('http://localhost:3000/Create', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -48,9 +48,9 @@ function App() {
             })
             .then(data => {
                 alert(data);
-                getTask();
+                getTasks();
             });
-    }
+    }*/
 
     function editTask(props) {
         let title = props.title;
@@ -83,7 +83,7 @@ function App() {
             })
             .then(data => {
                 alert(data);
-                getTask();
+                getTasks();
             });
     }
 
@@ -97,7 +97,7 @@ function App() {
             })
             .then(data => {
                 alert(data);
-                getTask();
+                getTasks();
             });
     }
 }

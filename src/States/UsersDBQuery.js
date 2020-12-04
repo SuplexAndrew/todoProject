@@ -7,7 +7,7 @@ function App() {
     }, []);
 
     function getUser() {
-        fetch('http://localhost:3001/user')
+        fetch('http://localhost:3000/Login')
             .then(response => {
                 return response.text();
             })

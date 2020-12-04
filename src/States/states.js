@@ -1,60 +1,152 @@
+import axios from "axios";
 
-export let tasks = [
-    {
-        id: 1,
-        title: "XTask1",
-        text: "123",
-        employee: "Sergey",
-        dateStart: Date.parse("2020-10-10"),
-        dateEnd: Date.parse("2020-11-30"),
-        lastEdit: new Date()
-    },
-    {
-        id: 2,
-        title: "DTask2",
-        text: "555!",
-        employee: "Artem",
-        dateStart: Date.parse("2020-10-17"),
-        dateEnd: Date.parse("2021-11-5"),
-        lastEdit: new Date()
-    },
-    {
-        id: 3,
-        title: "ATask3",
-        text: "000xxxx",
-        employee: "Olga",
-        dateStart: Date.parse("2020-10-16"),
-        dateEnd: Date.parse("2020-11-30"),
-        lastEdit: new Date()
-    },
-    {
-        id: 4,
-        title: "AcvTask4",
-        text: "0---8",
-        employee: "Maksim",
-        dateStart: Date.parse("2020-10-20"),
-        dateEnd: Date.parse("2020-10-30"),
-        lastEdit: new Date()
-    },
-    {
-        id: 5,
-        title: "JunTask5",
-        text: "0////",
-        employee: "Maksim",
-        dateStart: Date.parse("2020-10-18"),
-        dateEnd: Date.parse("2020-11-4"),
-        lastEdit: new Date()
-    },
-]
+let store = {
 
-let _CurrentUser = {id: 3, login: "Default", password: ""};
+    Users: [
+        {id: 1, login: "Admin", password: "123"},
+        {id: 2, login: "User1", password: "1234"},
+    ],
 
-export const Users = [
-    {id: 1, login: "Admin", password: "123"},
-    {id: 2, login: "User1", password: "1234"},
-]
-export const CheckUser = (props) => {
-    let user = Users.find(user => user.login === props.login && user.password === props.password);
+    _CurrentUser: {id: 1, login: "Default", password: ""},
+    optionDate: [
+        {id: 1, name: "Сегодня"},
+        {id: 1, name: "Завтра"},
+        {id: 2, name: "Неделя"},
+        {id: 3, name: "Месяц"},
+        {id: 4, name: "Все"}
+    ],
+    optionSort: [
+        {id: 1, name: "Дате начала"},
+        {id: 2, name: "Дате окончания"},
+        {id: 3, name: "Последнему обновлению"},
+        {id: 4, name: "Алфавиту"}
+    ],
+    dispatch(action) {
+        switch (action.type) {
+            case 'GET_CURRENT_USER':
+                return this._CurrentUser;
+            case 'ADD_NEW_TASK':
+                debugger
+                axios.post(`http://localhost:3001/api/create`, {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify(action.data)
+                }).then(response => console.log(response))
+                    .catch(err => console.log(err.message))
+                debugger
+                break;
+            case 'GET_TASKS':
+                //return this._tasks
+                return this.getTasks()
+            case 'EDIT_TASK':
+                this.editTask(action.task)
+                break;
+            case 'DELETE_TASK':
+                this.deleteTask(action.task)
+                break;
+            default:
+                break;
+        }
+    },
+    getUsers() {
+        return this.Users;
+    },
+    createTask(props) {
+        let title = props.title;
+        let text = props.text;
+        let dateStart = props.dateStart
+        let dateEnd = props.dateEnd
+        let dateUpdate = props.dateUpdate
+        let priority = props.priority
+        let status = props.status
+        let CreatorId = props.creatorId
+        let EmployeeId = props.employeeId
+        fetch('http://localhost:3000/Create', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                title,
+                text,
+                dateStart,
+                dateEnd,
+                dateUpdate,
+                priority,
+                status,
+                CreatorId,
+                EmployeeId
+            }),
+        })
+            .then(response => {
+                return response.text();
+            })
+        this.getTasks();
+    },
+
+    getTasks() {
+        const response = axios.get(`http://localhost:3001/api`);
+        console.log(response.data);
+        console.log(response.body);
+        return response.body;
+    },
+    editTask(props) {
+        let title = props.title;
+        let text = props.text;
+        let dateStart = props.dateStart
+        let dateEnd = props.dateEnd
+        let dateUpdate = props.dateUpdate
+        let priority = props.priority
+        let status = props.status
+        let CreatorId = props.creatorId
+        let EmployeeId = props.employeeId
+        fetch('http://localhost:3001/Edit', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                title, text,
+                dateStart,
+                dateEnd,
+                dateUpdate,
+                priority,
+                status,
+                CreatorId,
+                EmployeeId
+            }),
+        })
+            .then(response => {
+                return response.text();
+            })
+        this.getTasks()
+    },
+    deleteTask(props) {
+        let id = props.id;
+        fetch(`http://localhost:3001/delete/${id}`, {
+            method: 'DELETE',
+        })
+            .then(response => {
+                return response.text();
+            })
+        this.getTasks();
+    },
+    getUser() {
+        fetch('http://localhost:3000/Login')
+            .then(response => {
+                return response.text();
+            })
+            .then(data => {
+                this._CurrentUser = data;
+            });
+    },
+    getTaskById(id) {
+        return this._tasks.find(x => x.id === id);
+    }
+}
+export default store
+/*CheckUser(props){
+    let user = this.Users.find(user => user.login === props.login && user.password === props.password);
     let b = user !== undefined;
     if (b)
         LoginUser(user.id);
@@ -66,29 +158,16 @@ export const CheckUser = (props) => {
         }
     }
     return b;
-}
-const LoginUser = (id) => {
-    _CurrentUser = Users.find(user => user.id === id);
-}
-export const GetCurrentUser = () => {
+},
+LoginUser:(id) => {
+    _CurrentUser = Users.find(user => user.id === id)
+},
+GetCurrentUser:() => {
     return _CurrentUser;
-}
+},
 
-export const optionDate = [
-    {id: 1, name: "Сегодня"},
-    {id: 1, name: "Завтра"},
-    {id: 2, name: "Неделя"},
-    {id: 3, name: "Месяц"},
-    {id: 4, name: "Все"}
-];
 
-export const optionSort = [
-    {id: 1, name: "Дате начала"},
-    {id: 2, name: "Дате окончания"},
-    {id: 3, name: "Последнему обновлению"},
-    {id: 4, name: "Алфавиту"}
-];
-export const OnNewTask = (props) => {
+OnNewTask:(props) => {
     tasks.push(
         {
             id: tasks.length + 1,
@@ -100,8 +179,8 @@ export const OnNewTask = (props) => {
             lastEdit: new Date()
         }
     )
-}
-export const OnEditTask = (props) => {
+},
+OnEditTask :(props) => {
     tasks[props.id] =
         {
             id: props.id,
@@ -112,4 +191,4 @@ export const OnEditTask = (props) => {
             dateEnd: props.dateEnd,
             lastEdit: new Date()
         }
-}
+}*/

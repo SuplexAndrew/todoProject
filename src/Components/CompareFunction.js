@@ -2,13 +2,13 @@
 export const getShowFunction = (value) =>{
     switch (value){
         case 1:
-            return a => Math.abs( (Date.now() - a.dateEnd)/(3600*1000)) < 24;
+            return a => Math.abs( (Date.now() - Date.parse(a.dateend))/(3600*1000)) < 24;
         case 2:
-            return a => Math.abs((Date.now() - a.dateEnd)/(3600*1000)) < 24 * 2;
+            return a => Math.abs((Date.now() - Date.parse(a.dateend))/(3600*1000)) < 24 * 2;
         case 3:
-            return a => Math.abs((Date.now() - a.dateEnd)/(3600*1000)) < 24 * 7;
+            return a => Math.abs((Date.now() - Date.parse(a.dateend))/(3600*1000)) < 24 * 7;
         case 4:
-            return a => Math.abs((Date.now() - a.dateEnd)/(3600*1000)) < 24 * 30;
+            return a => Math.abs((Date.now() -Date.parse(a.dateend))/(3600*1000)) < 24 * 30;
         case 5:
             return a => true;
         default:

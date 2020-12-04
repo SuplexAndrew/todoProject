@@ -1,5 +1,5 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
-import {GetCurrentUser} from "../States/states";
+import store from "../States/states";
 
 const Header = () => {
     return(
@@ -12,7 +12,7 @@ const Header = () => {
                 <a className="p-2 text-dark" href="#">Support</a>
                 <a className="p-2 text-dark" href="#">Pricing</a>
             </nav>
-            <a className="btn btn-outline-primary" href="#">{GetCurrentUser().login}</a>
+            <a className="btn btn-outline-primary" href="#">{store.dispatch({type: 'GET_CURRENT_USER'}).login}</a>
         </div>
     )
 }

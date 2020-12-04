@@ -1,4 +1,4 @@
-import MD5 from 'cryptojs'
+const MD5 = require('crypto-js/MD5')
 
 const Pool = require('pg').Pool
 const pool = new Pool({
@@ -9,14 +9,16 @@ const pool = new Pool({
     port: 5432,
 });
 
-const getUser = ({id, password}) => {
-    let pass = MD5(password)
+const getUser = ({id}) => {
+    //let pass = MD5(password)
     return new Promise(function (resolve, reject) {
-        pool.query(`SELECT * FROM users WHERE id = ${id}`, (error, results) => {
+        pool.query(`SELECT * FROM users`, (error, results) => {
             if (error) {
                 reject(error)
             }
+            debugger
             resolve(results.rows);
+            //console.log(results)
         })
     })
 }

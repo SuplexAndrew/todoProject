@@ -2,11 +2,11 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import React from "react";
 import {getSortFunction} from "./CompareFunction";
 import {getShowFunction} from "./CompareFunction";
-import {OnEditTask, OnNewTask, tasks} from "../States/states"
+import store from "../States/states"
 import Task from "./Task";
 import TaskEdit from "./TaskEdit";
 import Modal from "./Modal";
-import MD5 from 'cryptojs'
+import axios from "axios";
 
 
 class Main extends React.Component {
@@ -26,10 +26,12 @@ class Main extends React.Component {
 
     constructor(props) {
         super(props);
+        //let t = store.dispatch({type: "GET_TASKS"})
         this.state = {
             showState: 1,
             sortState: 1,
-            tasks: tasks,
+            alltasks: [],
+            tasks: [],
             isCreating: false,
             isEditing: false,
             EditingID: 0,
@@ -38,18 +40,26 @@ class Main extends React.Component {
         this.handleChangeOptionSort = this.handleChangeOptionSort.bind(this);
     }
 
+    componentDidMount() {
+        axios.get(`http://localhost:3001/api`)
+            .then(response => {
+                this.setState({tasks: response.data.body, alltasks: response.data.body})
+            })
+            .catch(err =>
+                console.log(err.message))
+    }
+
     handleChangeOptionShow = (e) => {
         let ss = this.optionShow.find(item => item.name === e.target.value).id
         this.setState({showState: ss});
-        let t = tasks.filter(getShowFunction(ss))
+        let t = this.state.alltasks.filter(getShowFunction(ss))
         t.sort(getSortFunction(this.state.sortState))
         this.setState({tasks: t, showState: ss});
     }
     handleChangeOptionSort = (e) => {
         let ss = this.optionSort.find(item => item.name === e.target.value).id
-        let t = tasks.filter(getShowFunction(this.state.showState))
+        let t = this.state.alltasks.filter(getShowFunction(this.state.showState))
         t.sort(getSortFunction(ss))
-        //debugger
         this.setState({tasks: t, sortState: ss});
     }
 
@@ -58,7 +68,13 @@ class Main extends React.Component {
     }
     handleOnSubmit = (props) => {
         if (!props.isCancel) {
-            OnNewTask(props)
+            //store.dispatch({action: 'ADD_NEW_TASK', data: props.data})
+            axios.post(`http://localhost:3001/api/create`, {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify(props.data)
+            }).then(response => console.log(response))
+                .catch(err => console.log(err.message))
         }
         this.setState({isCreating: this.isCreating = !this.isCreating});
     }
@@ -67,10 +83,13 @@ class Main extends React.Component {
     }
     handleOnSubmitEdit = (props) => {
         if (!props.isCancel) {
-            OnEditTask(props)
-            debugger;
-            this.setState({tasks: tasks})
-            alert(this.state.tasks[1].title)
+            //store.dispatch({action: 'EDIT_TASK', task: props})
+            axios.post(`http://localhost:3001/api/edit/${props.data.id}`, {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify(props.data)
+            }).then(response => console.log(response))
+                .catch(err => console.log(err.message))
         }
         this.setState({EditingID: 0, isEditing: this.isEditing = !this.isEditing});
     }
@@ -80,7 +99,6 @@ class Main extends React.Component {
             <div>
                 <div className="d-flex flex-column flex-md-row
                 align-items-center px-md-4  mb-3 bg-white border-bottom ">
-                    <label>{MD5("password")}</label>
                     <label>Отображать на:</label>
                     <select value={this.state.optionShow} onChange={this.handleChangeOptionShow}>
                         {this.optionShow.map(item => <option key={item.id} value={item.name}>{item.name}</option>)}
@@ -92,32 +110,33 @@ class Main extends React.Component {
                     <button onClick={this.handleOnClick}>Создать новую задачу</button>
                 </div>
                 {this.isCreating && <Modal>
-                    <TaskEdit onClick={this.handleOnSubmit}/>
+                    <TaskEdit
+                        onClick={this.handleOnSubmit}/>
                 </Modal>}
                 {this.isEditing &&
                 <Modal>
                     <TaskEdit
                         onClick={this.handleOnSubmitEdit}
-                        id={this.state.EditingID}
-                        title={tasks[1].title}
-                        employee={tasks[1].employee}
-                        text={tasks[1].text}
-                        dateStart={tasks[1].dateStart}
-                        dateEnd={tasks[1].dateEnd}
+                        body={this.state.alltasks.find(x => x.id === this.state.EditingID)}
                     />
                 </Modal>}
                 <div>
-                    {this.state.tasks.map(item =>
-                        <Task
-                            key={item.id}
-                            id={item.id}
-                            title={item.title}
-                            text={item.text}
-                            employee={item.employee}
-                            dateStart={item.dateStart}
-                            dateEnd={item.dateEnd}
-                            onClick={this.handleOnEdit}
-                        />)}
+                    {
+                        this.state.tasks.map(item =>
+                            <Task
+                                key={item.id}
+                                id={item.id}
+                                title={item.title}
+                                text={item.text}
+                                employeeId={item.employeeid}
+                                dateStart={item.datestart}
+                                dateEnd={item.dateend}
+                                dateUpdate={item.dateupdate}
+                                priority={item.priority}
+                                status={item.status}
+                                creatorId={item.creatorid}
+                                onClick={this.handleOnEdit}
+                            />)}
                 </div>
             </div>
         )

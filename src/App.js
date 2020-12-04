@@ -4,24 +4,31 @@ import Main from "./Components/Main";
 import {Route} from "react-router-dom";
 import Login from "./Login";
 import {BrowserRouter} from "react-router-dom";
-import {GetCurrentUser} from "./States/states";
+import store from "./States/states";
 import Header from "./Components/Header";
+import axios from 'axios'
 
-export default class App extends React.Component{
+class App extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {tasks: [], isAuthenticated: true}
+    }
     render() {
         return (
             <BrowserRouter>
                 <Header/>
-                <Router/>
+                <Router tasks={this.state.tasks}/>
             </BrowserRouter>
         )
     }
 }
 
-const Router = () => {
-    if (GetCurrentUser().id !== 0) {
-        return <Main/>
+const Router = (props) => {
+    if (store.dispatch({type: "GET_CURRENT_USER"}) !== undefined) {
+        return <Main tasks={props.tasks}/>
     } else {
         return <Route path="/" component={Login}/>
     }
 }
+
+export default App
