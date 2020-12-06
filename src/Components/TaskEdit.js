@@ -1,8 +1,8 @@
 import React from "react";
 import "./TaskEdit.css"
 import 'bootstrap/dist/css/bootstrap.min.css';
-import store from "../States/states"
 import moment from 'moment'
+import axios from "axios";
 
 class TaskEdit extends React.Component {
 
@@ -12,17 +12,17 @@ class TaskEdit extends React.Component {
             this.state = {
                 id: props.body.id,
                 title: props.body.title,
-                employeeId: 1,
+                employeeId: props.body.employeeid,
                 text: props.body.text,
                 priority: props.body.priority,
                 status: props.body.status,
                 dateStart: props.body.datestart,
                 dateEnd: props.body.dateend,
                 dateUpdate: props.body.dateupdate,
-                creatorId: 1
+                creatorId: 1,
+                users: []
             };
-        }
-        else {
+        } else {
             this.state = {
                 id: '',
                 title: '',
@@ -33,8 +33,10 @@ class TaskEdit extends React.Component {
                 priority: 3,
                 status: 1,
                 employeeId: 1,
-                creatorId: 1
-            };
+                creatorId: 1,
+                users: []
+            }
+
         }
         this.handleChangeTitle = this.handleChangeTitle.bind(this);
         this.handleChangeEmployee = this.handleChangeEmployee.bind(this);
@@ -45,6 +47,16 @@ class TaskEdit extends React.Component {
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleCancel = this.handleCancel.bind(this);
 
+    }
+
+    componentDidMount() {
+        axios.get(`http://localhost:3001/api/users`)
+            .then(response => {
+                this.setState({users: response.data.body})
+            })
+            .catch(err =>
+                console.log(err.message))
+        //this.setState({users:[]})
     }
 
     handleChangeTitle(e) {
@@ -71,6 +83,8 @@ class TaskEdit extends React.Component {
             case 'Низкий':
                 p = 1;
                 break;
+            default:
+                break;
         }
         this.setState({priority: p});
     }
@@ -83,11 +97,11 @@ class TaskEdit extends React.Component {
         this.setState({dateEnd: e.target.value});
     }
 
-    handleSubmit(e) {
+    handleSubmit() {
         let d2 = this.state.dateEnd
         let d1 = this.state.dateStart
-        if (this.state.title !== '' && isNaN(d1) && isNaN(d2) && d2 > d1) {
-            this.props.onClick({data:this.state, isCancel: false})
+        if (this.state.title !== '' && isNaN(d1) && isNaN(d2) && d2 >= d1) {
+            this.props.onClick({data: this.state, isCancel: false})
         } else {
             alert("Некорректные данные")
         }
@@ -107,8 +121,11 @@ class TaskEdit extends React.Component {
                 </div>
                 <div className="edit-field">
                     <label>Ответственный: </label>
-                    <select value={this.state.employeeId} onChange={this.handleChangeEmployee}>
-                        {store.Users.map(item => <option key={item.id} value={item.login}>{item.login}</option>)}
+                    <select
+                        onChange={this.handleChangeEmployee}>
+                        {this.state.users.map
+                        (item => <option selected={item.id === this.state.id}
+                                         key={item.id} value={item.login}>{item.login}</option>)}
                     </select>
                 </div>
                 <div className="edit-field">

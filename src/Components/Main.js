@@ -2,7 +2,6 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import React from "react";
 import {getSortFunction} from "./CompareFunction";
 import {getShowFunction} from "./CompareFunction";
-import store from "../States/states"
 import Task from "./Task";
 import TaskEdit from "./TaskEdit";
 import Modal from "./Modal";
@@ -26,12 +25,13 @@ class Main extends React.Component {
 
     constructor(props) {
         super(props);
-        //let t = store.dispatch({type: "GET_TASKS"})
         this.state = {
-            showState: 1,
-            sortState: 1,
+            userid: props.userid,
+            showState: 0,
+            sortState: 0,
             alltasks: [],
             tasks: [],
+            users: [],
             isCreating: false,
             isEditing: false,
             EditingID: 0,
@@ -39,14 +39,17 @@ class Main extends React.Component {
         this.handleChangeOptionShow = this.handleChangeOptionShow.bind(this);
         this.handleChangeOptionSort = this.handleChangeOptionSort.bind(this);
     }
-
-    componentDidMount() {
-        axios.get(`http://localhost:3001/api`)
+    getTasks(){
+        axios.get(`http://localhost:3001/api/tasks`)
             .then(response => {
                 this.setState({tasks: response.data.body, alltasks: response.data.body})
             })
             .catch(err =>
                 console.log(err.message))
+    }
+
+    componentDidMount() {
+        this.getTasks();
     }
 
     handleChangeOptionShow = (e) => {
@@ -62,7 +65,6 @@ class Main extends React.Component {
         t.sort(getSortFunction(ss))
         this.setState({tasks: t, sortState: ss});
     }
-
     handleOnClick = () => {
         this.setState({isCreating: this.isCreating = !this.isCreating});
     }
@@ -79,7 +81,7 @@ class Main extends React.Component {
         this.setState({isCreating: this.isCreating = !this.isCreating});
     }
     handleOnEdit = (props) => {
-        this.setState({EditingID: props.id, isEditing: this.isEditing = !this.isEditing});
+        this.setState({EditingID: props.body.id, isEditing: this.isEditing = !this.isEditing});
     }
     handleOnSubmitEdit = (props) => {
         if (!props.isCancel) {
@@ -92,8 +94,8 @@ class Main extends React.Component {
                 .catch(err => console.log(err.message))
         }
         this.setState({EditingID: 0, isEditing: this.isEditing = !this.isEditing});
+        this.forceUpdate();
     }
-
     render() {
         return (
             <div>
@@ -101,7 +103,7 @@ class Main extends React.Component {
                 align-items-center px-md-4  mb-3 bg-white border-bottom ">
                     <label>Отображать на:</label>
                     <select value={this.state.optionShow} onChange={this.handleChangeOptionShow}>
-                        {this.optionShow.map(item => <option key={item.id} value={item.name}>{item.name}</option>)}
+                        {this.optionShow.map(item => <option selected key={item.id} value={item.name}>{item.name}</option>)}
                     </select>
                     <label>Сортировать по:</label>
                     <select value={this.state.optionSort} onChange={this.handleChangeOptionSort}>
@@ -125,16 +127,7 @@ class Main extends React.Component {
                         this.state.tasks.map(item =>
                             <Task
                                 key={item.id}
-                                id={item.id}
-                                title={item.title}
-                                text={item.text}
-                                employeeId={item.employeeid}
-                                dateStart={item.datestart}
-                                dateEnd={item.dateend}
-                                dateUpdate={item.dateupdate}
-                                priority={item.priority}
-                                status={item.status}
-                                creatorId={item.creatorid}
+                                item = {item}
                                 onClick={this.handleOnEdit}
                             />)}
                 </div>
