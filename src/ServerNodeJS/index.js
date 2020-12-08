@@ -21,13 +21,34 @@ app.use(function (req, res, next) {
     next();
 });
 
-app.get('/api/tasks', async (req, res) => {
+app.post('/api/tasks', async (req, res) => {
     try {
-        //const isleader = await pool.query('SELECT isleader FROM users WHERE id = $1', [])
-        const selectQuery = 'SELECT * FROM tasks'
-        const tasks = await pool.query(selectQuery)
+        const user = JSON.parse(req.body.body)
+        /*const selectQuery = user.id.toString() !== user.leaderid.toString() ?
+            'SELECT tasks.id, title, text, datestart, dateend, dateupdate, priority, status, u.login as employee, c.login as creator ' +
+            'FROM tasks ' +
+            'JOIN users u ON u.id = tasks.employeeid ' +
+            'JOIN users c ON c.id = tasks.creatorid ' +
+            'WHERE employeeid = $1'
+            :
+            'SELECT tasks.id, title, text, datestart, dateend, dateupdate, priority, status, u.login as employee, c.login as creator ' +
+            'FROM tasks ' +
+            'JOIN users u ON u.id = tasks.employeeid ' +
+            'JOIN users c ON c.id = tasks.creatorid ' +
+            'WHERE creatorid = $1 '
+*/
+        const selectQuery = user.id.toString() !== user.leaderid.toString() ?
+            'SELECT tasks.id, title, text, datestart, dateend, dateupdate, priority, status, employeeid, creatorid ' +
+            'FROM tasks ' +
+            'WHERE employeeid = $1'
+            :
+            'SELECT tasks.id, title, text, datestart, dateend, dateupdate, priority, status, employeeid, creatorid ' +
+            'FROM tasks ' +
+            'WHERE creatorid = $1 '
+        const tasks = await pool.query(selectQuery, [user.id])
         res.status(200).send({body: tasks.rows})
     } catch (e) {
+        console.log(e.message)
         res.status(500).send('err0r')
     }
 })
@@ -50,13 +71,13 @@ app.post('/api/create', async (req, res) => {
 })
 app.post('/api/edit/:id', async (req, res) => {
     try {
-        const {id, title, text, dateStart, dateEnd, dateUpdate, priority, status, creatorId, employeeId}
+        const {id, title, text, dateStart, dateEnd, dateUpdate, priority, status, creatorid, employeeid}
             = JSON.parse(req.body.body)
 
         const editQuery = 'UPDATE tasks SET title = $2, text = $3, datestart = $4, dateend = $5, dateupdate = $6,' +
             'priority = $7, status = $8, creatorid = $9, employeeid = $10 where id = $1'
         const newTodo = await pool.query(editQuery,
-            [id, title, text, dateStart, dateEnd, dateUpdate, priority, status, creatorId, employeeId])
+            [id, title, text, dateStart, dateEnd, dateUpdate, priority, status, creatorid, employeeid])
         res.status(200).send({body: newTodo})
     } catch (e) {
         res.status(500).send(e.message)
@@ -87,15 +108,15 @@ app.get('/api/users', async (req, res) => {
 app.post('/api/login', async (req, res) => {
     try {
         const {login, pass} = JSON.parse(req.body.body)
-        let output = await pool.query('SELECT id, firstname, lastname, patronymic, password,salt' +
+        let output = await pool.query('SELECT id, firstname, lastname, patronymic, password, salt, leaderid' +
                 ' FROM users WHERE login = $1', [login])
-        const {id, firstname, lastname, patronymic, password, salt,} = output.rows[0]
+        const {id, firstname, lastname, patronymic, password, salt, leaderid} = output.rows[0]
         if (pass === null)
             res.status(404).send('user not found')
         else {
             let isMatch = await bcrypt.hash(pass, salt) === (password)
             if (isMatch)
-                res.status(200).send({user: {id, firstname, lastname, patronymic, login}})
+                res.status(200).send({user: {id, firstname, lastname, patronymic, login, leaderid}})
             else{
                 console.log('wrong password')
                 res.status(400).send('wrong password')
@@ -108,12 +129,12 @@ app.post('/api/login', async (req, res) => {
 })
 app.post('/api/login/create', async (req, res) => {
     try {
-        const {firstname, lastname, patronymic, login, password, isleader} = JSON.parse(req.body.body)
+        const {firstname, lastname, patronymic, login, password, leaderid} = JSON.parse(req.body.body)
         const salt = await bcrypt.genSalt(5, 'a')
         const pass = await bcrypt.hash(password, salt)
-        let result = await pool.query('INSERT INTO users (firstname, lastname, patronymic, login, password, salt, isleader)' +
+        let result = await pool.query('INSERT INTO users (firstname, lastname, patronymic, login, password, salt, leaderid)' +
             'Values ($1, $2, $3, $4, $5, $6, $7);',
-            [firstname, lastname, patronymic, login, pass, salt, isleader])
+            [firstname, lastname, patronymic, login, pass, salt, leaderid])
         if (result)
             res.status(201).send('user added')
         else

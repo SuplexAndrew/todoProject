@@ -10,23 +10,25 @@ import axios from "axios";
 
 class Main extends React.Component {
     optionShow = [
-        {id: 1, name: "Сегодня"},
-        {id: 2, name: "Завтра"},
-        {id: 3, name: "Неделя"},
-        {id: 4, name: "Месяц"},
-        {id: 5, name: "Все"}
+        {id: 1, name: "Все"},
+        {id: 2, name: "Сегодня"},
+        {id: 3, name: "Завтра"},
+        {id: 4, name: "Неделя"},
+        {id: 5, name: "Месяц"},
+
     ];
     optionSort = [
         {id: 1, name: "Дате начала"},
         {id: 2, name: "Дате окончания"},
         {id: 3, name: "Последнему обновлению"},
-        {id: 4, name: "Алфавиту"}
+        {id: 4, name: "Алфавиту"},
+        {id: 5, name: "Приоритету"},
     ];
 
     constructor(props) {
         super(props);
         this.state = {
-            userid: props.userid,
+            user: JSON.parse(localStorage.getItem('token')),
             showState: 0,
             sortState: 0,
             alltasks: [],
@@ -39,17 +41,24 @@ class Main extends React.Component {
         this.handleChangeOptionShow = this.handleChangeOptionShow.bind(this);
         this.handleChangeOptionSort = this.handleChangeOptionSort.bind(this);
     }
-    getTasks(){
-        axios.get(`http://localhost:3001/api/tasks`)
+
+    componentDidMount() {
+        axios.post(`http://localhost:3001/api/tasks`, {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: localStorage.getItem('token')
+        })
             .then(response => {
                 this.setState({tasks: response.data.body, alltasks: response.data.body})
             })
             .catch(err =>
                 console.log(err.message))
-    }
-
-    componentDidMount() {
-        this.getTasks();
+        axios.get(`http://localhost:3001/api/users`)
+            .then(response => {
+                this.setState({users: response.data.body})
+            })
+            .catch(err =>
+                console.log(err.message))
     }
 
     handleChangeOptionShow = (e) => {
@@ -81,7 +90,7 @@ class Main extends React.Component {
         this.setState({isCreating: this.isCreating = !this.isCreating});
     }
     handleOnEdit = (props) => {
-        this.setState({EditingID: props.body.id, isEditing: this.isEditing = !this.isEditing});
+        this.setState({EditingID: props.body.id.toString(), isEditing: this.isEditing = !this.isEditing});
     }
     handleOnSubmitEdit = (props) => {
         if (!props.isCancel) {
@@ -96,6 +105,7 @@ class Main extends React.Component {
         this.setState({EditingID: 0, isEditing: this.isEditing = !this.isEditing});
         this.forceUpdate();
     }
+
     render() {
         return (
             <div>
@@ -103,13 +113,14 @@ class Main extends React.Component {
                 align-items-center px-md-4  mb-3 bg-white border-bottom ">
                     <label>Отображать на:</label>
                     <select value={this.state.optionShow} onChange={this.handleChangeOptionShow}>
-                        {this.optionShow.map(item => <option selected key={item.id} value={item.name}>{item.name}</option>)}
+                        {this.optionShow.map(item => <option key={item.id} value={item.name}>{item.name}</option>)}
                     </select>
                     <label>Сортировать по:</label>
                     <select value={this.state.optionSort} onChange={this.handleChangeOptionSort}>
                         {this.optionSort.map(item => <option key={item.id} value={item.name}>{item.name}</option>)}
                     </select>
-                    <button onClick={this.handleOnClick}>Создать новую задачу</button>
+                    {this.state.user.id === this.state.user.leaderid.toString() &&
+                    <button onClick={this.handleOnClick}>Создать новую задачу</button>}
                 </div>
                 {this.isCreating && <Modal>
                     <TaskEdit
@@ -122,14 +133,15 @@ class Main extends React.Component {
                         body={this.state.alltasks.find(x => x.id === this.state.EditingID)}
                     />
                 </Modal>}
-                <div>
-                    {
-                        this.state.tasks.map(item =>
-                            <Task
-                                key={item.id}
-                                item = {item}
-                                onClick={this.handleOnEdit}
-                            />)}
+                <div className="mb-3 text-center">
+                    {this.state.tasks.map(item =>
+                        <Task
+                            key={item.id}
+                            item={item}
+                            isEditable={this.state.user.id === this.state.user.leaderid.toString()}
+                            users={this.state.users}
+                            onClick={this.handleOnEdit}
+                        />)}
                 </div>
             </div>
         )

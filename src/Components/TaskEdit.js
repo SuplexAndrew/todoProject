@@ -12,14 +12,14 @@ class TaskEdit extends React.Component {
             this.state = {
                 id: props.body.id,
                 title: props.body.title,
-                employeeId: props.body.employeeid,
+                employeeid: props.body.employeeid,
                 text: props.body.text,
                 priority: props.body.priority,
                 status: props.body.status,
                 dateStart: props.body.datestart,
                 dateEnd: props.body.dateend,
                 dateUpdate: props.body.dateupdate,
-                creatorId: 1,
+                creatorid: props.body.creatorid,
                 users: []
             };
         } else {
@@ -30,10 +30,10 @@ class TaskEdit extends React.Component {
                 dateStart: '',
                 dateEnd: '',
                 dateUpdate: Date.now(),
-                priority: 3,
+                priority: 2,
                 status: 1,
-                employeeId: 1,
-                creatorId: 1,
+                employeeid: '',
+                creatorId: JSON.parse(localStorage.getItem('token')).id,
                 users: []
             }
 
@@ -64,7 +64,8 @@ class TaskEdit extends React.Component {
     }
 
     handleChangeEmployee(e) {
-        this.setState({employee: e.target.value});
+        let id = this.state.users.find(x => x.login === e.target.value).id
+        this.setState({employeeid: id});
     }
 
     handleChangeText(e) {
@@ -124,8 +125,7 @@ class TaskEdit extends React.Component {
                     <select
                         onChange={this.handleChangeEmployee}>
                         {this.state.users.map
-                        (item => <option selected={item.id === this.state.id}
-                                         key={item.id} value={item.login}>{item.login}</option>)}
+                        (item => <option key={item.id} value={item.login}>{item.login}</option>)}
                     </select>
                 </div>
                 <div className="edit-field">
