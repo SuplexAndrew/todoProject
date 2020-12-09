@@ -2,9 +2,9 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import React from "react";
 import {getSortFunction} from "./CompareFunction";
 import {getShowFunction} from "./CompareFunction";
-import Task from "./Task";
-import TaskEdit from "./TaskEdit";
-import Modal from "./Modal";
+import Task from "./Task/Task";
+import TaskEdit from "./TaskEdit/TaskEdit";
+import Modal from "./TaskEdit/Modal";
 import axios from "axios";
 
 
@@ -88,13 +88,13 @@ class Main extends React.Component {
                 .catch(err => console.log(err.message))
         }
         this.setState({isCreating: this.isCreating = !this.isCreating});
+        this.componentDidMount()
     }
     handleOnEdit = (props) => {
         this.setState({EditingID: props.body.id.toString(), isEditing: this.isEditing = !this.isEditing});
     }
     handleOnSubmitEdit = (props) => {
         if (!props.isCancel) {
-            //store.dispatch({action: 'EDIT_TASK', task: props})
             axios.post(`http://localhost:3001/api/edit/${props.data.id}`, {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
@@ -102,25 +102,30 @@ class Main extends React.Component {
             }).then(response => console.log(response))
                 .catch(err => console.log(err.message))
         }
-        this.setState({EditingID: 0, isEditing: this.isEditing = !this.isEditing});
-        this.forceUpdate();
+        this.setState({EditingID: 0, isEditing: this.isEditing = false});
+        if (props.isDelete){
+            axios.delete(`http://localhost:3001/api/delete/${props.data.id}`)
+                .then(response => console.log(response))
+                .catch(err => console.log(err.message))
+        }
+        this.componentDidMount()
     }
 
     render() {
         return (
             <div>
                 <div className="d-flex flex-column flex-md-row
-                align-items-center px-md-4  mb-3 bg-white border-bottom ">
+                align-items-center  px-md-4  mb-3 bg-white border-bottom mb-3">
                     <label>Отображать на:</label>
-                    <select value={this.state.optionShow} onChange={this.handleChangeOptionShow}>
+                    <select className='mb-2' value={this.state.optionShow} onChange={this.handleChangeOptionShow}>
                         {this.optionShow.map(item => <option key={item.id} value={item.name}>{item.name}</option>)}
                     </select>
-                    <label>Сортировать по:</label>
-                    <select value={this.state.optionSort} onChange={this.handleChangeOptionSort}>
+                    <label className='ml-2'>Сортировать по:</label>
+                    <select className='mb-2' value={this.state.optionSort} onChange={this.handleChangeOptionSort}>
                         {this.optionSort.map(item => <option key={item.id} value={item.name}>{item.name}</option>)}
                     </select>
                     {this.state.user.id === this.state.user.leaderid.toString() &&
-                    <button onClick={this.handleOnClick}>Создать новую задачу</button>}
+                    <button className='btn btn-info ml-3 mb-2' onClick={this.handleOnClick}>Создать новую задачу</button>}
                 </div>
                 {this.isCreating && <Modal>
                     <TaskEdit
@@ -141,6 +146,7 @@ class Main extends React.Component {
                             isEditable={this.state.user.id === this.state.user.leaderid.toString()}
                             users={this.state.users}
                             onClick={this.handleOnEdit}
+                            onStatusClick={this.handleOnSubmitEdit}
                         />)}
                 </div>
             </div>

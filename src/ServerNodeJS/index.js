@@ -3,7 +3,6 @@ const bcrypt = require('bcrypt')
 const app = express()
 const port = 3001
 
-//const pool = require('./db')
 const Pool = require('pg').Pool
 const pool = new Pool({
     user: 'postgres',
@@ -12,7 +11,6 @@ const pool = new Pool({
     password: '123',
     port: 5432,
 });
-//const TaskModel = require('../Models/TaskModel')
 app.use(express.json())
 app.use(function (req, res, next) {
     res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
@@ -55,14 +53,13 @@ app.post('/api/tasks', async (req, res) => {
 app.post('/api/create', async (req, res) => {
     try {
         const insertQuery =
-            'INSERT INTO tasks (title, text, dateStart, dateEnd, dateUpdate, priority, status, CreatorId, EmployeeId) ' +
+            'INSERT INTO tasks (title, text, datestart, dateend, dateupdate, priority, status, creatorid, employeeid) ' +
             'VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *'
-        const {title, text, dateStart, dateEnd, dateUpdate, priority, status, creatorId, employeeId}
+        const {title, text, datestart, dateend, dateupdate, priority, status, creatorid, employeeid}
             = JSON.parse(req.body.body)
-
         const newTodo = await pool.query(insertQuery,
-            [title, text, new Date(dateStart), new Date(dateEnd), new Date(dateUpdate),
-                priority, status, creatorId, employeeId])
+            [title, text, new Date(datestart), new Date(dateend), new Date(dateupdate),
+                priority, status, creatorid, employeeid])
         res.status(200).send({body: newTodo})
     } catch (e) {
         res.status(500).send(e.message)
@@ -71,13 +68,15 @@ app.post('/api/create', async (req, res) => {
 })
 app.post('/api/edit/:id', async (req, res) => {
     try {
-        const {id, title, text, dateStart, dateEnd, dateUpdate, priority, status, creatorid, employeeid}
+        const {id, title, text, datestart, dateend, dateupdate, priority, status, creatorid, employeeid}
             = JSON.parse(req.body.body)
-
+        datestart.setDate(datestart.getDate() + 1)
+        dateend.setDate(dateend.getDate() + 1)
+        dateupdate.setDate(dateupdate.getDate() + 1)
         const editQuery = 'UPDATE tasks SET title = $2, text = $3, datestart = $4, dateend = $5, dateupdate = $6,' +
             'priority = $7, status = $8, creatorid = $9, employeeid = $10 where id = $1'
         const newTodo = await pool.query(editQuery,
-            [id, title, text, dateStart, dateEnd, dateUpdate, priority, status, creatorid, employeeid])
+            [id, title, text, datestart, dateend, dateupdate, priority, status, creatorid, employeeid])
         res.status(200).send({body: newTodo})
     } catch (e) {
         res.status(500).send(e.message)
@@ -86,10 +85,9 @@ app.post('/api/edit/:id', async (req, res) => {
 })
 app.delete('/api/delete/:id', async (req, res) => {
     try {
-        const {id} = JSON.parse(req.body.body)
-        const editQuery =
-            `DELETE FROM tasks where id = ${id}`
-        const newTodo = await pool.query(editQuery)
+        const id = req.params.id
+        const editQuery = 'DELETE FROM tasks where id = $1'
+        const newTodo = await pool.query(editQuery, [id])
         res.status(200).send({body: newTodo})
     } catch (e) {
         res.status(500).send(e.message)

@@ -3,7 +3,7 @@ import './App.css';
 import Main from "./Components/Main";
 import Header from "./Components/Header";
 import axios from 'axios'
-import {Login2} from "./login2";
+import {Login} from "./Components/Login";
 
 
 class App extends React.Component {
@@ -48,7 +48,7 @@ class App extends React.Component {
         return (
             <>
                 {this.state.isAuthenticated && <Header/>}
-                {!this.state.isAuthenticated && <Login2 onLogin={this.onLogin}/>}
+                {!this.state.isAuthenticated && <Login onLogin={this.onLogin}/>}
                 {this.state.isAuthenticated && <Main/>}
             </>
         )
